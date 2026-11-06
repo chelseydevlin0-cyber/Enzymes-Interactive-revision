@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enzyme Lab | IGCSE Biology</title>
+<style>
+:root{--navy:#14243a;--blue:#2563eb;--cyan:#dff5f7;--ink:#203047;--muted:#617187;--paper:#f5f8fc;--white:#fff;--green:#16845b;--amber:#b7791f;--red:#c2413b}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+header{background:linear-gradient(120deg,#14243a,#1e5581);color:white;padding:30px max(22px,calc((100vw - 1080px)/2)) 26px}
+header .eyebrow{font-size:.76rem;letter-spacing:.14em;text-transform:uppercase;color:#b9e6ef;font-weight:800}
+h1{font-size:clamp(2rem,5vw,3.1rem);line-height:1.08;margin:8px 0}
+header p{max-width:760px;color:#e0edf7;margin:10px 0 0}
+main{max-width:1080px;margin:24px auto;padding:0 18px 55px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.tab{border:1px solid #d4deea;background:white;color:#34445b;padding:10px 15px;border-radius:999px;font-weight:700;cursor:pointer}
+.tab.active{background:var(--navy);color:white;border-color:var(--navy)}
+.panel{display:none}.panel.active{display:block}
+.card{background:white;border:1px solid #e0e7f0;border-radius:18px;padding:22px;margin:0 0 16px;box-shadow:0 5px 20px #1b35500a}
+h2{font-size:1.45rem;margin:0 0 12px;color:var(--navy)}h3{font-size:1.05rem;margin:0 0 8px;color:var(--navy)}
+.lead{color:var(--muted);margin-top:-4px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.fact{background:#f1f7fb;border-radius:13px;padding:15px}
+.pill{display:inline-block;background:#e7f1ff;color:#1d4ed8;padding:3px 9px;border-radius:99px;font-size:.78rem;font-weight:800}
+strong.key{color:#124e78}
+.callout{border-left:4px solid #28a4b8;background:#effbfc;padding:13px 16px;border-radius:8px;margin:14px 0}
+button,.action{font:inherit}.action{background:var(--blue);color:white;border:0;padding:10px 16px;border-radius:10px;font-weight:750;cursor:pointer}
+.action.secondary{background:#e9eef5;color:#25364d}.action:disabled{opacity:.45;cursor:not-allowed}
+label{font-weight:700;display:block;margin:10px 0 5px}
+input[type=range]{width:100%;accent-color:var(--blue)}
+select{padding:9px;border:1px solid #cbd5e1;border-radius:9px;background:white;font:inherit}
+.simgrid{display:grid;grid-template-columns: minmax(0,1fr) minmax(260px,.9fr);gap:20px;align-items:center}
+.metric{font-size:2.2rem;font-weight:850;color:var(--blue);line-height:1.2}
+.meter{height:13px;background:#e6edf5;border-radius:99px;overflow:hidden;margin:10px 0}
+.meter span{display:block;height:100%;background:linear-gradient(90deg,#29b6a2,#2563eb);width:0%;transition:width .2s}
+canvas{width:100%;height:220px;border:1px solid #e2e8f0;border-radius:12px;background:#fff}
+.question{padding:16px 0;border-top:1px solid #e7edf4}.question:first-of-type{border-top:0}
+.option{display:block;text-align:left;width:100%;margin:7px 0;padding:10px 12px;border:1px solid #d6dfeb;border-radius:10px;background:#fff;cursor:pointer;color:var(--ink)}
+.option:hover{border-color:#6b9df2;background:#f7faff}.option.chosen{border-color:var(--blue);background:#edf4ff}.option.correct{border-color:#3b9c72;background:#effaf4}.option.wrong{border-color:#d56b65;background:#fff3f2}
+.feedback{font-size:.92rem;margin-top:8px;color:var(--muted);min-height:22px}
+.progress{height:8px;background:#e8eef5;border-radius:9px;overflow:hidden}.progress span{display:block;height:100%;background:#2563eb;width:0%}
+footer{text-align:center;color:#718096;font-size:.85rem;margin-top:20px}
+@media(max-width:700px){.grid,.simgrid{grid-template-columns:1fr}.card{padding:17px}header{padding-top:24px}}
+</style>
+
+<style>
+/* Game layer */
+.game-hero{background:linear-gradient(135deg,#172b4d,#245b83);color:#fff;border-radius:20px;padding:22px;margin:0 0 16px;overflow:hidden;position:relative}
+.game-hero:after{content:"✦  ✧  ✦";position:absolute;right:18px;top:12px;color:#b8e9f1;font-size:2rem;letter-spacing:12px;opacity:.8}
+.game-hero h2{color:white;margin:5px 0}.game-hero p{color:#e0edf7;max-width:720px}
+.game-stats{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.stat-chip{background:#ffffff1b;border:1px solid #ffffff35;border-radius:12px;padding:8px 12px;font-weight:800}
+.mission-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mission{border:1px solid #dbe5ef;border-radius:15px;padding:15px;background:#fff}
+.mission.done{border-color:#7bc6a3;background:#f0fbf5}
+.mission button{margin-top:9px}
+.lab-scene{background:radial-gradient(circle at 50% 45%,#f0fbff,#e6f0fa);border:1px solid #dce8f3;border-radius:16px;min-height:230px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.enzyme-shape{width:175px;height:135px;background:#65b8b0;border:5px solid #267c80;border-radius:48% 52% 43% 57% / 54% 44% 56% 46%;position:relative;box-shadow:inset -12px -10px 0 #00000012,0 12px 20px #245b8320}
+.enzyme-shape:before{content:"";position:absolute;top:-4px;left:63px;width:54px;height:42px;background:#e6f0fa;border-radius:0 0 28px 28px;border-bottom:5px solid #267c80}
+.substrate-shape{position:absolute;width:43px;height:43px;background:#f4b942;border:4px solid #ad7616;border-radius:12px 12px 5px 5px;top:20px;left:calc(50% - 21px);transform:rotate(45deg);animation:floaty 2.2s ease-in-out infinite}
+.substrate-shape.dock{animation:dock 1.2s ease forwards}
+.product{position:absolute;width:24px;height:24px;background:#ed8c75;border:3px solid #a94d45;border-radius:50%;opacity:0}
+.product.one{left:calc(50% - 40px);top:36px}.product.two{left:calc(50% + 18px);top:36px}
+.product.show{animation:release 1.1s ease forwards}
+@keyframes floaty{0%,100%{transform:translateY(0) rotate(45deg)}50%{transform:translateY(12px) rotate(60deg)}}
+@keyframes dock{0%{top:20px;opacity:1}65%{top:83px;opacity:1;transform:rotate(0)}100%{top:83px;opacity:0;transform:scale(.6)}}
+@keyframes release{0%{opacity:0;transform:scale(.4)}100%{opacity:1;transform:translateY(-36px) scale(1)}}
+.scene-label{position:absolute;bottom:10px;left:0;right:0;text-align:center;color:#456078;font-size:.85rem;font-weight:800}
+.game-action{background:#0e806b;color:white;border:0;border-radius:10px;padding:10px 15px;font-weight:800;cursor:pointer}
+.game-action:disabled{opacity:.5}
+.xpbar{height:10px;background:#e5edf5;border-radius:20px;overflow:hidden}.xpbar span{height:100%;display:block;background:linear-gradient(90deg,#f4b942,#23a68a);width:0%;transition:width .4s}
+.badge-unlock{display:inline-block;background:#fff2ca;color:#82590b;border-radius:99px;padding:4px 10px;font-size:.78rem;font-weight:900}
+@media(max-width:700px){.mission-grid{grid-template-columns:1fr}}
+</style>
+
+
+<style>
+.diagram-card{background:#f8fbff;border:1px solid #dce7f2;border-radius:15px;padding:14px;margin:14px 0}
+.diagram-title{font-weight:850;color:#183653;margin:0 0 8px}
+.diagram-note{font-size:.88rem;color:#60738a;margin:7px 0 0}
+.diagram-svg{display:block;width:100%;height:auto;max-height:245px}
+.diagram-key{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:#53677e;margin-top:8px}
+.key-dot{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:middle}
+</style>
+
+</head>
+<body>
+<header>
+  <div class="eyebrow">IGCSE Biology • Interactive learning lab</div>
+  <h1>Enzymes & enzyme activity</h1>
+  <p>Explore how enzymes work, investigate the effects of temperature and pH, then test your understanding with exam-style questions.</p>
+</header>
+<main>
+<nav class="tabs" aria-label="Learning sections">
+ <button class="tab active" data-tab="learn">1. Learn</button>
+ <button class="tab" data-tab="lab">2. Interactive lab</button>
+ <button class="tab" data-tab="check">3. Check your understanding</button>
+</nav>
+
+<section id="learn" class="panel active">
+
+<div class="game-hero">
+ <div class="eyebrow">🧪 SCIENCE QUEST • LEVEL 1</div>
+ <h2>Operation: Enzyme Rescue</h2>
+ <p>Your enzyme lab has lost its activity data! Complete the missions, earn XP and help the enzyme team discover the conditions that keep reactions running.</p>
+ <div class="game-stats">
+  <div class="stat-chip">⭐ XP: <span id="xp">0</span></div>
+  <div class="stat-chip">🏅 Badges: <span id="badges">0</span>/4</div>
+  <div class="stat-chip">🚀 Rank: <span id="rank">Lab Trainee</span></div>
+ </div>
+ <div style="margin-top:13px;font-weight:800;font-size:.85rem">MISSION PROGRESS</div><div class="xpbar"><span id="xpbar"></span></div>
+</div>
+<div class="card">
+ <h2>🎮 Mini-game: Dock the substrate!</h2>
+ <p class="lead">Watch what happens when a substrate meets its complementary active site.</p>
+ <div class="simgrid">
+  <div class="lab-scene" id="scene">
+   <div class="enzyme-shape"></div><div class="substrate-shape" id="substrate"></div>
+   <div class="product one" id="product1"></div><div class="product two" id="product2"></div>
+   <div class="scene-label" id="sceneLabel">Ready? Press “Run reaction”.</div>
+  </div>
+  <div>
+   <h3>Reaction sequence</h3>
+   <ol><li>Substrate approaches the active site.</li><li>An enzyme–substrate complex forms.</li><li>Products are released.</li><li>The enzyme is ready to be reused.</li></ol>
+   <button class="game-action" id="runReaction">▶ Run reaction</button>
+   <p id="reactionFeedback" class="feedback" aria-live="polite">The enzyme stays unchanged after the reaction.</p>
+  </div>
+ </div>
+</div>
+<div class="card">
+ <h2>🗺️ Your missions</h2>
+ <p class="lead">Complete all four missions to earn your Enzyme Expert badge.</p>
+ <div class="mission-grid">
+  <div class="mission" id="mission1"><span class="pill">Mission 1 • 20 XP</span><h3>Shape Match</h3><p>Identify why enzymes are specific.</p><button class="action secondary" onclick="missionQuestion(1)">Start mission</button><div id="missionFeedback1" class="feedback"></div></div>
+  <div class="mission" id="mission2"><span class="pill">Mission 2 • 20 XP</span><h3>Temperature Trouble</h3><p>Choose what happens above the optimum temperature.</p><button class="action secondary" onclick="missionQuestion(2)">Start mission</button><div id="missionFeedback2" class="feedback"></div></div>
+  <div class="mission" id="mission3"><span class="pill">Mission 3 • 20 XP</span><h3>pH Detective</h3><p>Work out why extreme pH can reduce activity.</p><button class="action secondary" onclick="missionQuestion(3)">Start mission</button><div id="missionFeedback3" class="feedback"></div></div>
+  <div class="mission" id="mission4"><span class="pill">Mission 4 • 20 XP</span><h3>Substrate Surge</h3><p>Explain why the rate eventually levels off.</p><button class="action secondary" onclick="missionQuestion(4)">Start mission</button><div id="missionFeedback4" class="feedback"></div></div>
+ </div>
+ <div id="missionChallenge" class="callout" style="margin-top:16px" hidden></div>
+</div>
+
+ <div class="card">
+  <span class="pill">Core knowledge</span>
+  <h2>What is an enzyme?</h2>
+  <p>An enzyme is a <strong>biological catalyst</strong>. It speeds up a chemical reaction without being used up or permanently changed by the reaction. Most enzymes are proteins.</p>
+  <div class="grid">
+   <div class="fact"><h3>Substrate</h3><p>The substance an enzyme acts on.</p></div>
+   <div class="fact"><h3>Active site</h3><p>The part of the enzyme where the substrate binds.</p></div>
+   <div class="fact"><h3>Enzyme–substrate complex</h3><p>Forms temporarily when the substrate binds to the active site.</p></div>
+   <div class="fact"><h3>Products</h3><p>The substances made by the reaction. They leave the active site.</p></div>
+  </div>
+
+  <div class="diagram-card">
+   <p class="diagram-title">Diagram 1: Parts of an enzyme</p>
+   <svg class="diagram-svg" viewBox="0 0 640 230" role="img" aria-label="Diagram of an enzyme showing its active site and a complementary substrate">
+    <defs><marker id="arrA" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6" fill="#53677e"/></marker></defs>
+    <path d="M165 72 C185 28 258 24 292 53 C322 26 391 43 407 82 C447 117 422 184 375 190 C339 219 281 195 258 189 C210 209 151 174 151 131 C131 111 143 85 165 72Z" fill="#75c4bb" stroke="#267c80" stroke-width="5"/>
+    <path d="M263 48 Q286 78 310 48 L310 48 Q319 89 287 102 Q255 89 263 48Z" fill="#f8fbff" stroke="#267c80" stroke-width="4"/>
+    <path d="M271 16 L303 16 L303 48 L271 48Z" fill="#f4b942" stroke="#ad7616" stroke-width="4"/>
+    <path d="M303 29 L432 29" stroke="#53677e" stroke-width="2" marker-end="url(#arrA)"/>
+    <text x="440" y="34" font-size="17" fill="#203047" font-weight="700">Substrate</text>
+    <path d="M312 77 L452 77" stroke="#53677e" stroke-width="2" marker-end="url(#arrA)"/>
+    <text x="460" y="82" font-size="17" fill="#203047" font-weight="700">Active site</text>
+    <path d="M185 165 L83 190" stroke="#53677e" stroke-width="2" marker-end="url(#arrA)"/>
+    <text x="15" y="214" font-size="17" fill="#203047" font-weight="700">Enzyme</text>
+    <text x="320" y="220" font-size="12" fill="#60738a">Simplified 2D model — not to scale</text>
+   </svg>
+   <div class="diagram-key"><span><i class="key-dot" style="background:#75c4bb"></i>Enzyme</span><span><i class="key-dot" style="background:#f4b942"></i>Substrate</span><span><i class="key-dot" style="background:#f8fbff;border:1px solid #267c80"></i>Active site</span></div>
+   <p class="diagram-note">The substrate has a complementary shape to the enzyme's active site, allowing it to bind.</p>
+  </div>
+
+  <div class="callout"><strong>Specificity:</strong> The active site has a shape that is complementary to its substrate. This means an enzyme usually catalyses only one type of reaction.</div>
+ </div>
+ <div class="card">
+  <h2>How an enzyme works</h2>
+  <p class="lead">Follow the sequence from substrate binding to product release.</p>
+  <div class="grid">
+   <div class="fact"><span class="pill">Step 1</span><h3>Binding</h3><p>The substrate collides with and binds to the enzyme's active site.</p></div>
+   <div class="fact"><span class="pill">Step 2</span><h3>Reaction</h3><p>An enzyme–substrate complex forms. The enzyme lowers the activation energy needed for the reaction.</p></div>
+   <div class="fact"><span class="pill">Step 3</span><h3>Release</h3><p>Products are formed and leave the active site.</p></div>
+   <div class="fact"><span class="pill">Step 4</span><h3>Reuse</h3><p>The enzyme is unchanged and can catalyse another reaction.</p></div>
+  </div>
+
+  <div class="diagram-card">
+   <p class="diagram-title">Diagram 2: The enzyme reaction cycle</p>
+   <svg class="diagram-svg" viewBox="0 0 760 210" role="img" aria-label="Four stages of enzyme action: enzyme and substrate, enzyme-substrate complex, products released, enzyme unchanged">
+    <defs><marker id="arrB" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0 0 L7 3 L0 6" fill="#64748b"/></marker></defs>
+    <g font-family="Arial,sans-serif" text-anchor="middle">
+     <g transform="translate(88,20)"><path d="M-42 65 Q-55 15 -5 15 Q42 4 49 49 Q63 91 12 103 Q-37 108 -42 65Z" fill="#75c4bb" stroke="#267c80" stroke-width="4"/><path d="M-9 15 Q0 35 11 15" fill="#f8fbff" stroke="#267c80" stroke-width="3"/><rect x="-7" y="-8" width="15" height="23" rx="3" fill="#f4b942" stroke="#ad7616" stroke-width="2"/><text x="0" y="137" font-size="15" fill="#203047" font-weight="700">1. Binding</text><text x="0" y="157" font-size="12" fill="#60738a">Substrate approaches</text></g>
+     <path d="M155 75 L220 75" stroke="#64748b" stroke-width="3" marker-end="url(#arrB)"/>
+     <g transform="translate(290,20)"><path d="M-42 65 Q-55 15 -5 15 Q42 4 49 49 Q63 91 12 103 Q-37 108 -42 65Z" fill="#75c4bb" stroke="#267c80" stroke-width="4"/><rect x="-9" y="10" width="18" height="24" rx="3" fill="#f4b942" stroke="#ad7616" stroke-width="2"/><text x="0" y="137" font-size="15" fill="#203047" font-weight="700">2. Complex</text><text x="0" y="157" font-size="12" fill="#60738a">Substrate binds</text></g>
+     <path d="M357 75 L422 75" stroke="#64748b" stroke-width="3" marker-end="url(#arrB)"/>
+     <g transform="translate(492,20)"><path d="M-42 65 Q-55 15 -5 15 Q42 4 49 49 Q63 91 12 103 Q-37 108 -42 65Z" fill="#75c4bb" stroke="#267c80" stroke-width="4"/><circle cx="-3" cy="4" r="10" fill="#ed8c75" stroke="#a94d45" stroke-width="2"/><circle cx="21" cy="-4" r="10" fill="#ed8c75" stroke="#a94d45" stroke-width="2"/><text x="0" y="137" font-size="15" fill="#203047" font-weight="700">3. Products</text><text x="0" y="157" font-size="12" fill="#60738a">Products leave</text></g>
+     <path d="M559 75 L624 75" stroke="#64748b" stroke-width="3" marker-end="url(#arrB)"/>
+     <g transform="translate(690,20)"><path d="M-42 65 Q-55 15 -5 15 Q42 4 49 49 Q63 91 12 103 Q-37 108 -42 65Z" fill="#75c4bb" stroke="#267c80" stroke-width="4"/><text x="0" y="137" font-size="15" fill="#203047" font-weight="700">4. Reuse</text><text x="0" y="157" font-size="12" fill="#60738a">Enzyme unchanged</text></g>
+    </g>
+   </svg>
+   <p class="diagram-note">The enzyme is not used up. It can bind to another substrate and catalyse another reaction.</p>
+  </div>
+
+  <div class="callout"><strong>Remember:</strong> Enzymes do not make reactions happen by supplying energy. They lower the activation energy.</div>
+ </div>
+ <div class="card">
+  <h2>Factors affecting enzyme activity</h2>
+
+  <div class="diagram-card">
+   <p class="diagram-title">Diagram 3: Typical patterns in enzyme activity</p>
+   <div class="grid">
+    <div>
+     <svg class="diagram-svg" viewBox="0 0 330 205" role="img" aria-label="Temperature versus enzyme activity graph showing a rise to an optimum then a steep fall">
+      <path d="M38 15 V165 H312" fill="none" stroke="#64748b" stroke-width="2"/>
+      <path d="M40 151 C75 145 105 117 135 66 C153 35 166 23 181 28 C195 35 201 100 222 139 C239 159 270 163 300 164" fill="none" stroke="#2563eb" stroke-width="4"/>
+      <path d="M165 28 V165" stroke="#d94841" stroke-dasharray="5 5" stroke-width="2"/>
+      <text x="9" y="18" font-size="11" fill="#53677e">Rate</text><text x="145" y="195" font-size="11" fill="#53677e">Temperature</text><text x="170" y="18" font-size="11" fill="#c2413b">Optimum</text>
+     </svg>
+     <p class="diagram-note"><strong>Temperature:</strong> rate rises towards the optimum, then falls steeply as the enzyme denatures.</p>
+    </div>
+    <div>
+     <svg class="diagram-svg" viewBox="0 0 330 205" role="img" aria-label="pH versus enzyme activity graph showing a bell-shaped curve around an optimum pH">
+      <path d="M38 15 V165 H312" fill="none" stroke="#64748b" stroke-width="2"/>
+      <path d="M40 160 C85 158 105 125 130 68 C148 28 178 24 197 48 C221 79 235 143 300 160" fill="none" stroke="#16845b" stroke-width="4"/>
+      <path d="M165 27 V165" stroke="#d94841" stroke-dasharray="5 5" stroke-width="2"/>
+      <text x="9" y="18" font-size="11" fill="#53677e">Rate</text><text x="153" y="195" font-size="11" fill="#53677e">pH</text><text x="170" y="18" font-size="11" fill="#c2413b">Optimum</text>
+     </svg>
+     <p class="diagram-note"><strong>pH:</strong> activity is highest at the enzyme's optimum pH and decreases on either side.</p>
+    </div>
+   </div>
+   <p class="diagram-note">These are schematic curves. The exact optimum and curve shape vary between enzymes.</p>
+  </div>
+
+  <div class="grid">
+   <div><h3>Temperature</h3><p>As temperature rises, particles have more kinetic energy. They move faster, so successful collisions between enzyme and substrate become more frequent. The rate increases up to the <strong>optimum temperature</strong>.</p><p>Above the optimum, bonds maintaining the enzyme's shape break. The active site changes shape and the enzyme becomes <strong>denatured</strong>.</p></div>
+   <div><h3>pH</h3><p>Each enzyme has an optimum pH. Moving away from this pH can alter bonds and charges that maintain the enzyme's shape. The active site changes, so fewer enzyme–substrate complexes form.</p><p>At very high or low pH, the enzyme may become denatured.</p></div>
+   <div><h3>Substrate concentration</h3><p>Increasing substrate concentration increases collision frequency and rate, until all active sites are occupied. The enzyme becomes the limiting factor and the rate levels off.</p></div>
+   <div><h3>Enzyme concentration</h3><p>If substrate is plentiful, increasing enzyme concentration provides more active sites, so the rate increases.</p></div>
+  </div>
+ </div>
+ <div class="card">
+  <h2>Key vocabulary</h2>
+  <p><strong>Optimum:</strong> the condition at which an enzyme works at its maximum rate.</p>
+  <p><strong>Denatured:</strong> the enzyme's three-dimensional structure, including its active site, has changed so the substrate no longer fits properly.</p>
+  <p><strong>Rate of reaction:</strong> how quickly reactants are converted into products.</p>
+  <p><strong>Activation energy:</strong> the minimum energy needed for a reaction to occur.</p>
+ </div>
+</section>
+
+<section id="lab" class="panel">
+ <div class="card">
+  <span class="pill">Explore the variables</span>
+  <h2>Enzyme activity simulator</h2>
+  <p class="lead">Change one factor at a time and observe the modelled relative rate. This is a simplified teaching model, not experimental data for a particular enzyme.</p>
+  <div class="simgrid">
+   <div>
+    <label for="factor">Factor to investigate</label>
+    <select id="factor">
+     <option value="temp">Temperature (°C)</option>
+     <option value="ph">pH</option>
+     <option value="substrate">Substrate concentration</option>
+     <option value="enzyme">Enzyme concentration</option>
+    </select>
+    <label id="valueLabel" for="value">Temperature: 37 °C</label>
+    <input id="value" type="range" min="0" max="80" value="37">
+    <div style="display:flex;justify-content:space-between;color:#718096;font-size:.82rem"><span id="minLabel">0</span><span id="maxLabel">80</span></div>
+    <p id="explanation" class="callout" aria-live="polite">Near the model's optimum temperature, enzyme activity is high.</p>
+    <button class="action secondary" id="reset">Reset settings</button>
+   </div>
+   <div>
+    <div style="color:#68788d;font-weight:700">Relative enzyme activity</div>
+    <div class="metric"><span id="rate">100</span><span style="font-size:1rem;color:#718096"> / 100</span></div>
+    <div class="meter"><span id="bar"></span></div>
+    <canvas id="graph" width="560" height="260" aria-label="Graph showing the modelled effect of the selected factor on enzyme activity"></canvas>
+    <p style="font-size:.8rem;color:#718096;margin-bottom:0">The curve updates as you move the slider. The peak represents the model's optimum.</p>
+   </div>
+  </div>
+ </div>
+ <div class="card">
+  <h2>Think like a scientist</h2>
+  <p>Try each investigation and explain the pattern you observe.</p>
+  <ol>
+   <li>Set temperature to 10 °C, then increase it towards 37 °C. What happens to the rate?</li>
+   <li>Increase temperature beyond 37 °C. Why does the rate fall?</li>
+   <li>Change pH from 7 towards 2 and then 12. What happens away from the optimum?</li>
+   <li>Increase substrate concentration. Why does the rate eventually stop increasing?</li>
+  </ol>
+ </div>
+</section>
+
+<section id="check" class="panel">
+ <div class="card">
+  <span class="pill">Knowledge check</span>
+  <h2>Can you explain enzyme activity?</h2>
+  <p class="lead">Choose an answer for each question, then check your responses. There are 8 questions.</p>
+  <div class="progress"><span id="quizProgress"></span></div>
+  <div id="quiz"></div>
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:15px">
+   <button class="action" id="mark">Mark my answers</button>
+   <button class="action secondary" id="retry">Try again</button>
+   <strong id="score" aria-live="polite"></strong>
+  </div>
+ </div>
+ <div class="card">
+  <h2>Exam-style written practice</h2>
+  <p><strong>Question:</strong> Explain why the rate of an enzyme-controlled reaction increases as temperature rises towards the optimum, but decreases rapidly above the optimum. (4 marks)</p>
+  <textarea id="written" rows="4" style="width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:12px;font:inherit" placeholder="Write your answer here..."></textarea>
+  <button class="action" style="margin-top:10px" id="reveal">Reveal a model answer</button>
+  <div id="model" class="callout" hidden><strong>Possible 4-mark answer:</strong><ol><li>As temperature increases, particles gain kinetic energy.</li><li>Enzyme and substrate particles move faster, increasing the frequency of successful collisions / enzyme–substrate complex formation.</li><li>Above the optimum, bonds maintaining the enzyme's shape break and the active site changes shape.</li><li>The enzyme is denatured, so the substrate is no longer complementary to the active site and the rate decreases.</li></ol></div>
+ </div>
+</section>
+<footer>Enzyme Lab • IGCSE Biology revision • Educational model for learning</footer>
+</main>
+<script>
+const tabs=document.querySelectorAll('.tab');
+tabs.forEach(b=>b.addEventListener('click',()=>{tabs.forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===b.dataset.tab));}));
+const factor=document.getElementById('factor'), slider=document.getElementById('value');
+const label=document.getElementById('valueLabel'), minL=document.getElementById('minLabel'), maxL=document.getElementById('maxLabel');
+const rateEl=document.getElementById('rate'), bar=document.getElementById('bar'), explain=document.getElementById('explanation');
+const canvas=document.getElementById('graph'),ctx=canvas.getContext('2d');
+const configs={
+ temp:{min:0,max:80,value:37,unit:'°C',name:'Temperature',opt:37},
+ ph:{min:0,max:14,value:7,unit:'',name:'pH',opt:7},
+ substrate:{min:0,max:100,value:50,unit:'%',name:'Substrate concentration',opt:null},
+ enzyme:{min:0,max:100,value:50,unit:'%',name:'Enzyme concentration',opt:null}
+};
+function activity(type,v){
+ if(type==='temp'){if(v<=37)return Math.max(0,100*Math.pow(v/37,1.45));return Math.max(0,100*Math.exp(-Math.pow((v-37)/13,1.35)));}
+ if(type==='ph')return Math.max(0,100*Math.exp(-Math.pow((v-7)/2.65,2)));
+ if(type==='substrate')return 100*v/(v+22);
+ return Math.min(100,v*1.35);
+}
+function explanation(type,v,r){
+ if(type==='temp')return v<37?'As temperature rises, particles gain kinetic energy and successful collisions become more frequent.':v===37?'This is the model optimum: the rate is at its maximum.':'Above the optimum, the active site changes shape as the enzyme denatures. Fewer substrates can bind.';
+ if(type==='ph')return Math.abs(v-7)<.6?'This is near the model optimum pH. The active site has a suitable shape for the substrate.':'Away from the optimum pH, the active site can change shape. At extreme pH, the enzyme may denature.';
+ if(type==='substrate')return v<75?'More substrate means more frequent collisions with available active sites.':'The rate is approaching a maximum because active sites become occupied; enzyme availability limits the rate.';
+ return 'More enzyme molecules provide more active sites. In this model, the rate rises while substrate is assumed to be plentiful.';
+}
+function draw(type){
+ const c=configs[type],w=canvas.width,h=canvas.height,pad=42;ctx.clearRect(0,0,w,h);
+ ctx.strokeStyle='#cbd5e1';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad,12);ctx.lineTo(pad,h-pad+4);ctx.lineTo(w-12,h-pad+4);ctx.stroke();
+ ctx.fillStyle='#64748b';ctx.font='14px Arial';ctx.fillText('Relative rate',8,18);ctx.fillText(c.name, w/2-25,h-8);
+ ctx.strokeStyle='#2563eb';ctx.lineWidth=3;ctx.beginPath();
+ for(let i=0;i<=100;i++){let v=c.min+(c.max-c.min)*i/100;let x=pad+(w-pad-18)*i/100;let y=h-pad-(h-pad-28)*activity(type,v)/100;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}ctx.stroke();
+ let v=+slider.value,x=pad+(w-pad-18)*(v-c.min)/(c.max-c.min),y=h-pad-(h-pad-28)*activity(type,v)/100;
+ ctx.fillStyle='#d94841';ctx.beginPath();ctx.arc(x,y,6,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle='#64748b';ctx.font='12px Arial';ctx.fillText('0',pad-4,h-pad+20);ctx.fillText('100',pad-8,30);
+}
+function update(){
+ const type=factor.value,c=configs[type],v=+slider.value,r=Math.round(activity(type,v));
+ label.textContent=c.name+': '+v+c.unit;minL.textContent=c.min;maxL.textContent=c.max;
+ rateEl.textContent=r;bar.style.width=r+'%';explain.textContent=explanation(type,v,r);draw(type);
+}
+function configure(){let c=configs[factor.value];slider.min=c.min;slider.max=c.max;slider.value=c.value;slider.step=factor.value==='ph'?.1:1;update();}
+factor.addEventListener('change',configure);slider.addEventListener('input',update);
+document.getElementById('reset').addEventListener('click',configure);configure();
+
+const questions=[
+{q:'What is an enzyme?',o:['A biological catalyst','A product of every reaction','A type of carbohydrate'],a:0,e:'An enzyme is a biological catalyst: it speeds up a reaction without being used up.'},
+{q:'What is the substrate?',o:['The part of an enzyme that binds','The substance an enzyme acts on','The energy needed to start a reaction'],a:1,e:'The substrate is the substance that binds to the enzyme active site.'},
+{q:'Why are enzymes specific?',o:['They work at every pH','They are used up after one reaction','Their active sites have complementary shapes to particular substrates'],a:2,e:'The active site shape is complementary to its substrate, giving enzyme specificity.'},
+{q:'Why does activity usually increase as temperature rises towards the optimum?',o:['The enzyme gets larger','Particles gain kinetic energy and collide more frequently','The substrate becomes an enzyme'],a:1,e:'Higher kinetic energy means faster particle movement and more frequent successful collisions.'},
+{q:'What happens when an enzyme is denatured?',o:['Its active site changes shape','It becomes a substrate','It is converted into energy'],a:0,e:'Denaturation changes the enzyme structure and active site, so the substrate no longer fits properly.'},
+{q:'What is an enzyme’s optimum pH?',o:['The pH at which it is destroyed','The pH at which it has its highest activity','Always pH 7'],a:1,e:'The optimum pH is the pH at which that particular enzyme works at its maximum rate. It is not always 7.'},
+{q:'Why does the rate level off at high substrate concentration?',o:['All enzyme active sites are occupied','The enzyme has turned into product','The temperature has fallen'],a:0,e:'When all active sites are occupied, enzyme concentration limits the rate.'},
+{q:'Which statement about an enzyme after a reaction is correct?',o:['It is always permanently changed','It has been used up','It can be reused'],a:2,e:'The enzyme is not used up in the reaction and can catalyse another reaction.'}
+];
+let chosen={};
+function renderQuiz(){
+ const root=document.getElementById('quiz');root.innerHTML='';
+ questions.forEach((q,i)=>{
+  const d=document.createElement('div');d.className='question';
+  const title=document.createElement('strong');title.textContent=(i+1)+'. '+q.q;d.appendChild(title);
+  q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='option'+(chosen[i]===j?' chosen':'');b.textContent=String.fromCharCode(65+j)+'. '+o;b.addEventListener('click',()=>{chosen[i]=j;document.getElementById('score').textContent='';renderQuiz();});d.appendChild(b);});
+  const fb=document.createElement('div');fb.className='feedback';fb.id='fb'+i;d.appendChild(fb);root.appendChild(d);
+ });
+ document.getElementById('quizProgress').style.width=(Object.keys(chosen).length/questions.length*100)+'%';
+}
+document.getElementById('mark').addEventListener('click',()=>{
+ if(Object.keys(chosen).length!==questions.length){document.getElementById('score').textContent='Answer all 8 questions first.';return;}
+ let score=0;questions.forEach((q,i)=>{let ok=chosen[i]===q.a;if(ok)score++;let fb=document.getElementById('fb'+i);fb.textContent=(ok?'Correct. ':'Not quite. ')+q.e;fb.style.color=ok?'#16845b':'#b6423b';});
+ document.getElementById('score').textContent='Your score: '+score+' / '+questions.length;
+});
+document.getElementById('retry').addEventListener('click',()=>{chosen={};renderQuiz();document.getElementById('score').textContent='';});
+document.getElementById('reveal').addEventListener('click',()=>{document.getElementById('model').hidden=false;});
+renderQuiz();
+
+const missionData={
+ 1:{q:'Why does an enzyme usually act on only one substrate?',opts:['Its active site has a complementary shape','It has unlimited energy','It changes into the substrate'],correct:0,why:'The active site is complementary to the substrate, so only a suitable substrate binds effectively.'},
+ 2:{q:'What happens to an enzyme above its optimum temperature?',opts:['It makes extra active sites','Its active site changes shape as it denatures','It becomes a carbohydrate'],correct:1,why:'Heat can disrupt bonds maintaining the enzyme structure. The active site changes shape and the substrate no longer fits properly.'},
+ 3:{q:'Why can very acidic or alkaline conditions reduce enzyme activity?',opts:['They can alter bonds and charges that maintain the active site','They always increase substrate concentration','They turn products back into enzymes'],correct:0,why:'Extreme pH can alter the enzyme structure and active-site shape. The enzyme may become denatured.'},
+ 4:{q:'Why does the rate level off at high substrate concentration?',opts:['The enzyme has run out','All active sites are occupied','The substrate stops moving'],correct:1,why:'When all active sites are occupied, adding more substrate cannot increase the rate. Enzyme concentration is limiting.'}
+};
+let gameXP=0,completedMissions=new Set(),activeMission=null;
+function updateGame(){
+ document.getElementById('xp').textContent=gameXP;
+ document.getElementById('badges').textContent=completedMissions.size;
+ document.getElementById('xpbar').style.width=(gameXP/80*100)+'%';
+ document.getElementById('rank').textContent=gameXP>=80?'Enzyme Expert':gameXP>=40?'Lab Scientist':gameXP>=20?'Junior Researcher':'Lab Trainee';
+}
+function missionQuestion(n){
+ activeMission=n;const m=missionData[n],box=document.getElementById('missionChallenge');box.hidden=false;
+ box.innerHTML='<strong>Mission '+n+': '+m.q+'</strong><div id="missionOptions"></div><div id="missionResult" class="feedback"></div>';
+ const opts=document.getElementById('missionOptions');
+ m.opts.forEach((o,i)=>{const b=document.createElement('button');b.className='option';b.textContent=String.fromCharCode(65+i)+'. '+o;b.addEventListener('click',()=>{
+  if(completedMissions.has(n)){document.getElementById('missionResult').textContent='Mission already completed — nice work!';return;}
+  const result=document.getElementById('missionResult');
+  if(i===m.correct){completedMissions.add(n);gameXP+=20;document.getElementById('mission'+n).classList.add('done');document.getElementById('missionFeedback'+n).textContent='✓ Mission complete! +20 XP';result.textContent='Correct! '+m.why;result.style.color='#16845b';updateGame();if(completedMissions.size===4)result.textContent+=' 🏆 All missions complete — you are an Enzyme Expert!';}
+  else{result.textContent='Not quite. Try again! Hint: think about the shape or availability of active sites.';result.style.color='#b6423b';}
+ });opts.appendChild(b);});
+}
+document.getElementById('runReaction').addEventListener('click',()=>{
+ const s=document.getElementById('substrate'),p1=document.getElementById('product1'),p2=document.getElementById('product2');
+ s.classList.remove('dock');p1.classList.remove('show');p2.classList.remove('show');
+ void s.offsetWidth;s.classList.add('dock');document.getElementById('sceneLabel').textContent='Substrate binds to the active site…';
+ document.getElementById('reactionFeedback').textContent='An enzyme–substrate complex forms.';
+ setTimeout(()=>{p1.classList.add('show');p2.classList.add('show');document.getElementById('sceneLabel').textContent='Products released! Enzyme unchanged.';document.getElementById('reactionFeedback').textContent='The products leave. The enzyme can be used again.';},1050);
+ setTimeout(()=>{s.classList.remove('dock');},1500);
+});
+updateGame();
+
+</script>
+</body>
+</html>
